@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NotaFiscal>
+    <!-- Elemento <ID> está ausente -->
+    <Data>2024-12-01</Data>
+    <ValorTotal>1000.50</ValorTotal>
+    <Impostos>150.75</Impostos>
+    <Produtos>
+        <Produto>
+            <Nome>Produto A</Nome>
+            <!-- Falta o preço -->
+        </Produto>
+        <!-- Produto sem tags -->
+    </Produtos>
+</NotaFiscal>

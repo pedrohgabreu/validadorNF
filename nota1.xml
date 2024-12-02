@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE NotaFiscal SYSTEM "notafiscal.dtd">
+<NotaFiscal>
+    <ID>12345</ID>
+    <Data>2024-12-02</Data>
+    <ValorTotal>150.50</ValorTotal>
+    <Impostos>15.05</Impostos>
+    <Produtos>
+        <Produto>
+            <Nome>Produto A</Nome>
+            <Quantidade>2</Quantidade>
+            <PrecoUnitario>50.25</PrecoUnitario>
+        </Produto>
+        <Produto>
+            <Nome>Produto B</Nome>
+            <Quantidade>1</Quantidade>
+            <PrecoUnitario>50.00</PrecoUnitario>
+        </Produto>
+    </Produtos>
+</NotaFiscal>

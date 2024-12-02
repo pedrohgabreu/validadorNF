@@ -1,0 +1,13 @@
+<NotaFiscal>
+    <ID>002</ID>
+    <Data>2024-12-02</Data>
+    <ValorTotal>250.00</ValorTotal>
+    <Impostos>37.50</Impostos>
+    <Produtos>
+        <Produto>
+            <Nome>Produto B</Nome>
+            <Quantidade>5</Quantidade>
+            <PrecoUnitario>50.00</PrecoUnitario>
+        </Produto>
+    </Produtos>
+</NotaFiscal>

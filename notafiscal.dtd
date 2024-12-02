@@ -1,0 +1,10 @@
+<!ELEMENT NotaFiscal (ID, Data, ValorTotal, Impostos, Produtos)>
+<!ELEMENT ID (#PCDATA)>
+<!ELEMENT Data (#PCDATA)>
+<!ELEMENT ValorTotal (#PCDATA)>
+<!ELEMENT Impostos (#PCDATA)>
+<!ELEMENT Produtos (Produto+)>
+<!ELEMENT Produto (Nome, Quantidade, PrecoUnitario)>
+<!ELEMENT Nome (#PCDATA)>
+<!ELEMENT Quantidade (#PCDATA)>
+<!ELEMENT PrecoUnitario (#PCDATA)>
