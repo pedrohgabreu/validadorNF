@@ -1,0 +1,50 @@
+<!ELEMENT nfeProc (NFe)>
+<!ELEMENT NFe (infNFe)>
+<!ELEMENT infNFe (ide, emit, dest, total)>
+
+<!-- Elemento ide -->
+<!ELEMENT ide (cUF, cNF, natOp, mod, serie, nNF, dhEmi, tpNF, idDest, cMunFG, tpImp, tpEmis, cDV, tpAmb, finNFe, indFinal, indPres)>
+<!ELEMENT cUF (#PCDATA)>
+<!ELEMENT cNF (#PCDATA)>
+<!ELEMENT natOp (#PCDATA)>
+<!ELEMENT mod (#PCDATA)>
+<!ELEMENT serie (#PCDATA)>
+<!ELEMENT nNF (#PCDATA)>
+<!ELEMENT dhEmi (#PCDATA)>
+<!ELEMENT tpNF (#PCDATA)>
+<!ELEMENT idDest (#PCDATA)>
+<!ELEMENT cMunFG (#PCDATA)>
+<!ELEMENT tpImp (#PCDATA)>
+<!ELEMENT tpEmis (#PCDATA)>
+<!ELEMENT cDV (#PCDATA)>
+<!ELEMENT tpAmb (#PCDATA)>
+<!ELEMENT finNFe (#PCDATA)>
+<!ELEMENT indFinal (#PCDATA)>
+<!ELEMENT indPres (#PCDATA)>
+
+<!-- Elemento emit -->
+<!ELEMENT emit (CNPJ, xNome, xFant, enderEmit)>
+<!ELEMENT CNPJ (#PCDATA)>
+<!ELEMENT xNome (#PCDATA)>
+<!ELEMENT xFant (#PCDATA)>
+<!ELEMENT enderEmit (xLgr, nro, xBairro, cMun, xMun, UF, CEP, fone)>
+<!ELEMENT xLgr (#PCDATA)>
+<!ELEMENT nro (#PCDATA)>
+<!ELEMENT xBairro (#PCDATA)>
+<!ELEMENT cMun (#PCDATA)>
+<!ELEMENT xMun (#PCDATA)>
+<!ELEMENT UF (#PCDATA)>
+<!ELEMENT CEP (#PCDATA)>
+<!ELEMENT fone (#PCDATA)>
+
+<!-- Elemento dest -->
+<!ELEMENT dest (CNPJ, xNome, enderDest)>
+<!ELEMENT enderDest (xLgr, nro, xBairro, cMun, xMun, UF, CEP, fone)>
+
+<!-- Elemento total -->
+<!ELEMENT total (ICMSTot)>
+<!ELEMENT ICMSTot (vBC, vICMS, vTotTrib)>
+<!ELEMENT vBC (#PCDATA)>
+<!ELEMENT vICMS (#PCDATA)>
+<!ELEMENT vTotTrib (#PCDATA)>
+

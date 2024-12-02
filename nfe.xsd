@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           targetNamespace="http://www.portalfiscal.inf.br/nfe"
+           xmlns="http://www.portalfiscal.inf.br/nfe"
+           elementFormDefault="qualified">
+
+    <!-- Definindo a estrutura do nfeProc -->
+    <xs:element name="nfeProc">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- Definição do elemento NFe -->
+                <xs:element name="NFe">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <!-- Definição do elemento infNFe -->
+                            <xs:element name="infNFe">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="ide">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="cUF" type="xs:int"/>
+                                                    <xs:element name="cNF" type="xs:int"/>
+                                                    <xs:element name="natOp" type="xs:string"/>
+                                                    <xs:element name="mod" type="xs:int"/>
+                                                    <xs:element name="serie" type="xs:int"/>
+                                                    <xs:element name="nNF" type="xs:int"/>
+                                                    <xs:element name="dhEmi" type="xs:dateTime"/>
+                                                    <xs:element name="tpNF" type="xs:int"/>
+                                                    <xs:element name="idDest" type="xs:int"/>
+                                                    <xs:element name="cMunFG" type="xs:int"/>
+                                                    <xs:element name="tpImp" type="xs:int"/>
+                                                    <xs:element name="tpEmis" type="xs:int"/>
+                                                    <xs:element name="cDV" type="xs:int"/>
+                                                    <xs:element name="tpAmb" type="xs:int"/>
+                                                    <xs:element name="finNFe" type="xs:int"/>
+                                                    <xs:element name="indFinal" type="xs:int"/>
+                                                    <xs:element name="indPres" type="xs:int"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- Definição do elemento emit -->
+                                        <xs:element name="emit">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="CNPJ" type="xs:string"/>
+                                                    <xs:element name="xNome" type="xs:string"/>
+                                                    <xs:element name="xFant" type="xs:string"/>
+                                                    <xs:element name="enderEmit">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="xLgr" type="xs:string"/>
+                                                                <xs:element name="nro" type="xs:string"/>
+                                                                <xs:element name="xBairro" type="xs:string"/>
+                                                                <xs:element name="cMun" type="xs:int"/>
+                                                                <xs:element name="xMun" type="xs:string"/>
+                                                                <xs:element name="UF" type="xs:string"/>
+                                                                <xs:element name="CEP" type="xs:string"/>
+                                                                <xs:element name="fone" type="xs:string"/>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <!-- Permitindo o atributo 'Id' e 'versao' em infNFe -->
+                                        <xs:attribute name="Id" type="xs:string"/>
+                                        <xs:attribute name="versao" type="xs:string"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
+

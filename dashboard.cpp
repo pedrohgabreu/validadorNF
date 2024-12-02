@@ -5,25 +5,41 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QFile>
-#include <QtXml>
+#include <QTableWidget>
+#include <QLabel>
+#include <QLineEdit>
+#include <QStyledItemDelegate>
+#include <QFont>
+#include <QColor>
+#include <QDomDocument>
 #include <libxml/parser.h>
-#include <libxml/valid.h>
 #include <libxml/xmlschemas.h>
+#include <QScreen>
+#include <QInputDialog>
 
 Dashboard::Dashboard(QWidget *parent) :
     QWidget(parent)
 {
+    // Layout principal
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     QTabWidget *tabWidget = new QTabWidget(this);
+    tabWidget->setStyleSheet("QTabWidget::pane {border: 1px solid #ddd; background-color: #f0f0f0;}");
 
     // Aba Geral
     QWidget *geralWidget = new QWidget();
     QVBoxLayout *geralLayout = new QVBoxLayout(geralWidget);
 
+    // Labels para mostrar as informações gerais
     labelNumNFs = new QLabel("Número total de NFs: 0");
     labelNumProdutos = new QLabel("Número total de produtos: 0");
     labelValorTotal = new QLabel("Valor total das NFs: 0.00");
     labelImpostosTotais = new QLabel("Valor total de impostos: 0.00");
+
+    // Estilizando as labels
+    labelNumNFs->setStyleSheet("font-size: 16px; font-weight: bold; color: #333;");
+    labelNumProdutos->setStyleSheet("font-size: 16px; font-weight: bold; color: #333;");
+    labelValorTotal->setStyleSheet("font-size: 16px; font-weight: bold; color: #333;");
+    labelImpostosTotais->setStyleSheet("font-size: 16px; font-weight: bold; color: #333;");
 
     geralLayout->addWidget(labelNumNFs);
     geralLayout->addWidget(labelNumProdutos);
@@ -35,121 +51,165 @@ Dashboard::Dashboard(QWidget *parent) :
     // Aba Notas Fiscais
     QWidget *nfWidget = new QWidget();
     QVBoxLayout *nfLayout = new QVBoxLayout(nfWidget);
+
     tableNotasFiscais = new QTableWidget(this);
     tableNotasFiscais->setColumnCount(4);
     tableNotasFiscais->setHorizontalHeaderLabels({"ID NF", "Data", "Valor", "Impostos"});
     tableNotasFiscais->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    tableNotasFiscais->setStyleSheet("QTableWidget {font-size: 14px; border: 1px solid #ddd; border-collapse: collapse;}"
+                                     "QTableWidget::item {padding: 5px;}"
+                                     "QHeaderView::section {background-color: #f2f2f2; border: 1px solid #ddd;}");
+
     nfLayout->addWidget(tableNotasFiscais);
 
-    // Botão para upload do XML
+    // Botão para upload de XML
     buttonUploadXML = new QPushButton("Upload XML", this);
+    buttonUploadXML->setStyleSheet("QPushButton {background-color: #4CAF50; color: white; font-size: 16px; border: none; padding: 10px 20px; border-radius: 5px;} QPushButton:hover {background-color: #45a049;}");
+
     connect(buttonUploadXML, &QPushButton::clicked, this, &Dashboard::handleUploadXML);
     nfLayout->addWidget(buttonUploadXML);
 
     tabWidget->addTab(nfWidget, "Notas Fiscais");
 
+    // Aba Fornecedores
+    QWidget *fornecedoresWidget = new QWidget();
+    QVBoxLayout *fornecedoresLayout = new QVBoxLayout(fornecedoresWidget);
+
+    tableFornecedores = new QTableWidget(this);
+    tableFornecedores->setColumnCount(2);
+    tableFornecedores->setHorizontalHeaderLabels({"Fornecedor", "NFs"});
+    tableFornecedores->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    fornecedoresLayout->addWidget(tableFornecedores);
+    tabWidget->addTab(fornecedoresWidget, "Fornecedores");
+
+    // Aba Transportadoras
+    QWidget *transportadorasWidget = new QWidget();
+    QVBoxLayout *transportadorasLayout = new QVBoxLayout(transportadorasWidget);
+
+    tableTransportadoras = new QTableWidget(this);
+    tableTransportadoras->setColumnCount(2);
+    tableTransportadoras->setHorizontalHeaderLabels({"Transportadora", "NFs"});
+    tableTransportadoras->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    transportadorasLayout->addWidget(tableTransportadoras);
+    tabWidget->addTab(transportadorasWidget, "Transportadoras");
+
     mainLayout->addWidget(tabWidget);
     setLayout(mainLayout);
-}
 
-void Dashboard::updateGeralInfo(int numNFs, int numProdutos, double valorTotal, double impostosTotais) {
-    labelNumNFs->setText(QString("Número total de NFs: %1").arg(numNFs));
-    labelNumProdutos->setText(QString("Número total de produtos: %1").arg(numProdutos));
-    labelValorTotal->setText(QString("Valor total das NFs: %1").arg(valorTotal, 0, 'f', 2));
-    labelImpostosTotais->setText(QString("Valor total de impostos: %1").arg(impostosTotais, 0, 'f', 2));
-}
+    // Centralizando a janela e ajustando o tamanho com QScreen
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QSize screenSize = screen->availableSize();
+    int width = 900;  // Largura desejada
+    int height = 600; // Altura desejada
+    int x = (screenSize.width() - width) / 2;
+    int y = (screenSize.height() - height) / 2;
 
-void Dashboard::updateNotasFiscaisTable(const QList<QList<QString>> &dadosNF) {
-    tableNotasFiscais->setRowCount(dadosNF.size());
-    for (int i = 0; i < dadosNF.size(); ++i) {
-        for (int j = 0; j < dadosNF[i].size(); ++j) {
-            tableNotasFiscais->setItem(i, j, new QTableWidgetItem(dadosNF[i][j]));
-        }
-    }
+    setGeometry(x, y, width, height); // Define a posição e o tamanho
 }
 
 bool Dashboard::validateWithDTD(const QString &xmlFilePath, const QString &dtdFilePath) {
-    // Abrir e analisar o arquivo XML
-    xmlDocPtr doc = xmlParseFile(xmlFilePath.toStdString().c_str());
-    if (!doc) {
+    // Converte os caminhos para xmlChar* para a função xmlParseDTD
+    xmlDocPtr doc = xmlReadFile(xmlFilePath.toUtf8().constData(), nullptr, 0);
+    if (doc == nullptr) {
         qWarning() << "Erro ao carregar o arquivo XML.";
         return false;
     }
 
-    // Usar BAD_CAST para a conversão correta para xmlChar*.
-    xmlDtdPtr dtd = xmlParseDTD(NULL, reinterpret_cast<const xmlChar *>(dtdFilePath.toStdString().c_str()));
-    if (!dtd) {
+    // Converte o caminho do DTD para xmlChar*
+    xmlDtdPtr dtd = xmlParseDTD(nullptr, (const xmlChar*)dtdFilePath.toUtf8().constData());
+    if (dtd == nullptr) {
+        qWarning() << "Erro ao carregar o arquivo DTD.";
         xmlFreeDoc(doc);
-        qWarning() << "Erro ao carregar o DTD.";
         return false;
     }
 
-    // Criar contexto de validação
-    xmlValidCtxtPtr validCtxt = xmlNewValidCtxt();
-    if (!validCtxt) {
+    // Cria o validador
+    xmlValidCtxtPtr ctxt = xmlNewValidCtxt();
+    if (ctxt == nullptr) {
+        qWarning() << "Erro ao criar o contexto de validação.";
         xmlFreeDoc(doc);
         xmlFreeDtd(dtd);
-        qWarning() << "Erro ao criar o contexto de validação DTD.";
         return false;
     }
 
-    // Validar o documento XML contra o DTD
-    bool isValid = xmlValidateDocument(validCtxt, doc);
-    xmlFreeValidCtxt(validCtxt);
+    // Realiza a validação
+    int result = xmlValidateDocument(ctxt, doc);
+    xmlFreeValidCtxt(ctxt);
     xmlFreeDoc(doc);
     xmlFreeDtd(dtd);
 
-    return isValid;
+    return result == 1;
 }
 
 bool Dashboard::validateWithXSD(const QString &xmlFilePath, const QString &xsdFilePath) {
-    xmlSchemaParserCtxtPtr parserCtxt = xmlSchemaNewParserCtxt(xsdFilePath.toStdString().c_str());
-    if (!parserCtxt) {
-        qWarning() << "Erro ao criar o contexto do schema.";
+    // Carrega o arquivo XML
+    xmlDocPtr doc = xmlReadFile(xmlFilePath.toUtf8().constData(), nullptr, 0);
+    if (doc == nullptr) {
+        qWarning() << "Erro ao carregar o arquivo XML.";
         return false;
     }
 
-    xmlSchemaPtr schema = xmlSchemaParse(parserCtxt);
-    xmlSchemaFreeParserCtxt(parserCtxt);
-    if (!schema) {
-        qWarning() << "Erro ao carregar o schema.";
+    // Carrega o arquivo XSD
+    xmlSchemaParserCtxtPtr schemaParserCtxt = xmlSchemaNewParserCtxt(xsdFilePath.toUtf8().constData());
+    if (schemaParserCtxt == nullptr) {
+        qWarning() << "Erro ao carregar o arquivo XSD.";
+        xmlFreeDoc(doc);
         return false;
     }
 
+    // Cria o esquema a partir do XSD
+    xmlSchemaPtr schema = xmlSchemaParse(schemaParserCtxt);
+    xmlSchemaFreeParserCtxt(schemaParserCtxt);
+    if (schema == nullptr) {
+        qWarning() << "Erro ao parsear o arquivo XSD.";
+        xmlFreeDoc(doc);
+        return false;
+    }
+
+    // Cria o validador
     xmlSchemaValidCtxtPtr validCtxt = xmlSchemaNewValidCtxt(schema);
-    if (!validCtxt) {
+    if (validCtxt == nullptr) {
+        qWarning() << "Erro ao criar o contexto de validação do XSD.";
+        xmlFreeDoc(doc);
         xmlSchemaFree(schema);
-        qWarning() << "Erro ao criar o contexto de validação.";
         return false;
     }
 
-    int result = xmlSchemaValidateFile(validCtxt, xmlFilePath.toStdString().c_str(), 0);
+    // Realiza a validação
+    int result = xmlSchemaValidateDoc(validCtxt, doc);
     xmlSchemaFreeValidCtxt(validCtxt);
+    xmlFreeDoc(doc);
     xmlSchemaFree(schema);
 
-    return (result == 0); // 0 indica validação bem-sucedida
+    return result == 0; // Retorna true se a validação for bem-sucedida
 }
 
 
+
 void Dashboard::handleUploadXML() {
-    // Carregar os arquivos XML
     QStringList fileNames = QFileDialog::getOpenFileNames(this, "Selecione arquivos XML", "", "Arquivos XML (*.xml)");
     if (fileNames.isEmpty()) {
         QMessageBox::information(this, "Nenhum Arquivo Selecionado", "Nenhum arquivo XML foi carregado.");
         return;
     }
 
-    // Carregar o arquivo XSD (opcional)
-    QString xsdFilePath = QFileDialog::getOpenFileName(this, "Selecione o arquivo XSD (opcional)", "", "Arquivos XSD (*.xsd)");
-    bool useXSD = !xsdFilePath.isEmpty();
+    QString validationType = QInputDialog::getItem(this, "Tipo de Validação", "Escolha o tipo de validação:", {"DTD", "XSD"}, 0, false);
+    if (validationType.isEmpty()) {
+        QMessageBox::information(this, "Nenhuma Validação Selecionada", "Nenhum tipo de validação foi escolhido.");
+        return;
+    }
 
-    // Carregar o arquivo DTD (opcional)
-    QString dtdFilePath = QFileDialog::getOpenFileName(this, "Selecione o arquivo DTD (opcional)", "", "Arquivos DTD (*.dtd)");
-    bool useDTD = !dtdFilePath.isEmpty();
+    QString schemaFilePath;
+    if (validationType == "DTD") {
+        schemaFilePath = QFileDialog::getOpenFileName(this, "Selecione o arquivo DTD", "", "Arquivos DTD (*.dtd)");
+    } else {
+        schemaFilePath = QFileDialog::getOpenFileName(this, "Selecione o arquivo XSD", "", "Arquivos XSD (*.xsd)");
+    }
 
-    // Validar se foi escolhido XSD ou DTD
-    if (!useXSD && !useDTD) {
-        QMessageBox::warning(this, "Erro", "Você deve escolher ao menos um arquivo XSD ou DTD para validação.");
+    if (schemaFilePath.isEmpty()) {
+        QMessageBox::information(this, "Nenhum Arquivo Selecionado", "Nenhum arquivo de esquema foi carregado.");
         return;
     }
 
@@ -161,24 +221,17 @@ void Dashboard::handleUploadXML() {
 
     for (const QString &fileName : fileNames) {
         bool isValid = false;
-
-        // Validar com XSD, se necessário
-        if (useXSD) {
-            isValid = validateWithXSD(fileName, xsdFilePath);
+        if (validationType == "DTD") {
+            isValid = validateWithDTD(fileName, schemaFilePath);
+        } else {
+            isValid = validateWithXSD(fileName, schemaFilePath);
         }
 
-        // Validar com DTD, se necessário
-        if (useDTD) {
-            isValid = validateWithDTD(fileName, dtdFilePath);
-        }
-
-        // Caso o XML não seja válido
         if (!isValid) {
             QMessageBox::warning(this, "Erro na Validação", "O arquivo " + fileName + " não é válido.");
             continue;
         }
 
-        // Processar o XML se for válido
         QFile file(fileName);
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
             QMessageBox::warning(this, "Erro ao Abrir Arquivo", "Não foi possível abrir o arquivo: " + fileName);
@@ -187,22 +240,18 @@ void Dashboard::handleUploadXML() {
 
         QDomDocument doc;
         if (!doc.setContent(&file)) {
-            QMessageBox::warning(this, "Erro no XML", "O arquivo " + fileName + " não é um XML válido.");
-            file.close();
+            QMessageBox::warning(this, "Erro ao Processar Arquivo", "Erro ao processar o conteúdo do arquivo: " + fileName);
             continue;
         }
         file.close();
 
-        // Lendo os dados do XML
         QDomElement root = doc.documentElement();
         QString id = root.firstChildElement("ID").text();
         QString data = root.firstChildElement("Data").text();
         QString valor = root.firstChildElement("ValorTotal").text();
         QString impostos = root.firstChildElement("Impostos").text();
 
-        int numProdutos = 0;
-        QDomNodeList produtos = root.firstChildElement("Produtos").elementsByTagName("Produto");
-        numProdutos = produtos.count();
+        int numProdutos = root.firstChildElement("Produtos").elementsByTagName("Produto").count();
 
         totalNotas++;
         totalProdutos += numProdutos;
@@ -215,5 +264,60 @@ void Dashboard::handleUploadXML() {
     if (!dadosNF.isEmpty()) {
         updateNotasFiscaisTable(dadosNF);
         updateGeralInfo(totalNotas, totalProdutos, valorTotal, impostosTotais);
+    }
+}
+
+
+// Função para atualizar as informações gerais no Dashboard
+void Dashboard::updateGeralInfo(int numNFs, int numProdutos, double valorTotal, double impostosTotais) {
+    labelNumNFs->setText(QString("Número total de NFs: %1").arg(numNFs));
+    labelNumProdutos->setText(QString("Número total de produtos: %1").arg(numProdutos));
+    labelValorTotal->setText(QString("Valor total das NFs: %1").arg(valorTotal, 0, 'f', 2));
+    labelImpostosTotais->setText(QString("Valor total de impostos: %1").arg(impostosTotais, 0, 'f', 2));
+}
+
+// Função para atualizar a tabela de Notas Fiscais
+void Dashboard::updateNotasFiscaisTable(const QList<QList<QString>> &dadosNF) {
+    tableNotasFiscais->setRowCount(dadosNF.size());
+    for (int i = 0; i < dadosNF.size(); ++i) {
+        for (int j = 0; j < dadosNF[i].size(); ++j) {
+            QTableWidgetItem *item = new QTableWidgetItem(dadosNF[i][j]);
+            item->setTextAlignment(Qt::AlignCenter); // Centralizando o texto
+            tableNotasFiscais->setItem(i, j, item);
+        }
+    }
+}
+
+// Função para exibir os Fornecedores
+void Dashboard::displayFornecedores(const QStringList &fornecedores, const QMap<QString, QList<QString>> &fornecedoresData) {
+    tableFornecedores->setRowCount(fornecedores.size());
+    int row = 0;
+    for (const QString &fornecedor : fornecedores) {
+        QTableWidgetItem *itemFornecedor = new QTableWidgetItem(fornecedor);
+        tableFornecedores->setItem(row, 0, itemFornecedor);
+
+        QStringList nfIds = fornecedoresData[fornecedor];
+        QString nfList = nfIds.join(", ");
+        QTableWidgetItem *itemNFs = new QTableWidgetItem(nfList);
+        tableFornecedores->setItem(row, 1, itemNFs);
+
+        row++;
+    }
+}
+
+// Função para exibir as Transportadoras
+void Dashboard::displayTransportadoras(const QStringList &transportadoras, const QMap<QString, QList<QString>> &transportadorasData) {
+    tableTransportadoras->setRowCount(transportadoras.size());
+    int row = 0;
+    for (const QString &transportadora : transportadoras) {
+        QTableWidgetItem *itemTransportadora = new QTableWidgetItem(transportadora);
+        tableTransportadoras->setItem(row, 0, itemTransportadora);
+
+        QStringList nfIds = transportadorasData[transportadora];
+        QString nfList = nfIds.join(", ");
+        QTableWidgetItem *itemNFs = new QTableWidgetItem(nfList);
+        tableTransportadoras->setItem(row, 1, itemNFs);
+
+        row++;
     }
 }

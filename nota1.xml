@@ -1,20 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE NotaFiscal SYSTEM "notafiscal.dtd">
-<NotaFiscal>
-    <ID>12345</ID>
-    <Data>2024-12-02</Data>
-    <ValorTotal>150.50</ValorTotal>
-    <Impostos>15.05</Impostos>
-    <Produtos>
-        <Produto>
-            <Nome>Produto A</Nome>
-            <Quantidade>2</Quantidade>
-            <PrecoUnitario>50.25</PrecoUnitario>
-        </Produto>
-        <Produto>
-            <Nome>Produto B</Nome>
-            <Quantidade>1</Quantidade>
-            <PrecoUnitario>50.00</PrecoUnitario>
-        </Produto>
-    </Produtos>
-</NotaFiscal>
+<nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
+   <NFe xmlns="http://www.portalfiscal.inf.br/nfe">
+      <infNFe Id="NFe12345678901234567890123456789012345678901234" versao="4.00">
+         <ide>
+            <cUF>35</cUF>
+            <cNF>123456</cNF>
+            <natOp>Venda</natOp>
+            <mod>55</mod>
+            <serie>1</serie>
+            <nNF>12345</nNF>
+            <dhEmi>2024-12-02T10:00:00-03:00</dhEmi>
+            <tpNF>1</tpNF>
+            <idDest>1</idDest>
+            <cMunFG>3550308</cMunFG>
+            <tpImp>1</tpImp>
+            <tpEmis>1</tpEmis>
+            <cDV>1</cDV>
+            <tpAmb>1</tpAmb>
+            <finNFe>1</finNFe>
+            <indFinal>1</indFinal>
+            <indPres>1</indPres>
+         </ide>
+         <emit>
+            <CNPJ>12345678000195</CNPJ>
+            <xNome>Empresa Exemplo</xNome>
+            <xFant>Empresa Exemplo Ltda</xFant>
+            <enderEmit>
+               <xLgr>Rua Exemplo</xLgr>
+               <nro>123</nro>
+               <xBairro>Centro</xBairro>
+               <cMun>3550308</cMun>
+               <xMun>São Paulo</xMun>
+               <UF>SP</UF>
+               <CEP>01000000</CEP>
+               <fone>1123456789</fone>
+            </enderEmit>
+         </emit>
+      </infNFe>
+   </NFe>
+</nfeProc>
+

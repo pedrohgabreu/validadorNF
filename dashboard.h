@@ -7,6 +7,9 @@
 #include <QPushButton>
 #include <QList>
 #include <QString>
+#include <QMap>
+#include <libxml/parser.h>
+#include <libxml/xmlschemas.h>
 
 class Dashboard : public QWidget {
     Q_OBJECT
@@ -20,6 +23,12 @@ public:
     // Atualiza a tabela de Notas Fiscais
     void updateNotasFiscaisTable(const QList<QList<QString>> &dadosNF);
 
+    // Exibe fornecedores
+    void displayFornecedores(const QStringList &fornecedores, const QMap<QString, QList<QString>> &fornecedoresData);
+
+    // Exibe transportadoras
+    void displayTransportadoras(const QStringList &transportadoras, const QMap<QString, QList<QString>> &transportadorasData);
+
 private slots:
     void handleUploadXML();
 
@@ -29,17 +38,15 @@ private:
     QLabel *labelValorTotal;
     QLabel *labelImpostosTotais;
     QTableWidget *tableNotasFiscais;
+    QTableWidget *tableFornecedores; // Tabela de fornecedores
+    QTableWidget *tableTransportadoras; // Tabela de transportadoras
     QPushButton *buttonUploadXML;
 
-    // Função de validação de XML com XSD
+    // Função de validação de XML com XSD usando libxml2
     bool validateWithXSD(const QString &xmlFilePath, const QString &xsdFilePath);
 
-    // Função de validação de XML com DTD
-    bool validateWithDTD(const QString &xmlFilePath);
-
-    // No arquivo dashboard.h, dentro da classe Dashboard:
+    // Função de validação de XML com DTD usando libxml2
     bool validateWithDTD(const QString &xmlFilePath, const QString &dtdFilePath);
-
 
 };
 
